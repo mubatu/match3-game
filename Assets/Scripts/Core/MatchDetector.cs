@@ -1,16 +1,18 @@
 using System.Collections.Generic;
+using System.Linq;
 using Enums;
 
 namespace Core
 {
     /// <summary>
     /// Detects matches of 3 or more consecutive same-type items on the grid.
-    /// Scans horizontally and vertically, merging overlapping matches.
+    /// Tracks individual match segments with orientation for power-up spawning.
     /// </summary>
     public class MatchDetector
     {
         private readonly GridManager _gridManager;
         private const int MinMatchCount = 3;
+        private const int PowerUpMatchCount = 4;
         
         public MatchDetector(GridManager gridManager)
         {
@@ -19,25 +21,54 @@ namespace Core
         
         /// <summary>
         /// Finds all matches on the entire grid.
+        /// Returns individual match segments with orientation.
         /// </summary>
         public List<MatchData> FindAllMatches()
         {
-            HashSet<BoardItem> allMatchedItems = new HashSet<BoardItem>();
+            List<MatchData> matches = new List<MatchData>();
+            HashSet<BoardItem> processedHorizontal = new HashSet<BoardItem>();
+            HashSet<BoardItem> processedVertical = new HashSet<BoardItem>();
             
             // Scan entire grid
             for (int x = 0; x < _gridManager.Width; x++)
             {
                 for (int y = 0; y < _gridManager.Height; y++)
                 {
-                    FindMatchesAt(x, y, allMatchedItems);
+                    BoardItem item = _gridManager.GetItemAt(x, y);
+                    if (item == null || !IsColoredItem(item.Type)) continue;
+                    
+                    // Check horizontal match starting from this position
+                    if (!processedHorizontal.Contains(item))
+                    {
+                        var horizontalMatch = GetHorizontalMatchSegment(x, y, item.Type);
+                        if (horizontalMatch.Count >= MinMatchCount)
+                        {
+                            // Use center item as pivot for initial matches
+                            var pivot = horizontalMatch[horizontalMatch.Count / 2];
+                            matches.Add(new MatchData(horizontalMatch, MatchOrientation.Horizontal, (pivot.X, pivot.Y)));
+                            foreach (var matched in horizontalMatch)
+                            {
+                                processedHorizontal.Add(matched);
+                            }
+                        }
+                    }
+                    
+                    // Check vertical match starting from this position
+                    if (!processedVertical.Contains(item))
+                    {
+                        var verticalMatch = GetVerticalMatchSegment(x, y, item.Type);
+                        if (verticalMatch.Count >= MinMatchCount)
+                        {
+                            // Use center item as pivot for initial matches
+                            var pivot = verticalMatch[verticalMatch.Count / 2];
+                            matches.Add(new MatchData(verticalMatch, MatchOrientation.Vertical, (pivot.X, pivot.Y)));
+                            foreach (var matched in verticalMatch)
+                            {
+                                processedVertical.Add(matched);
+                            }
+                        }
+                    }
                 }
-            }
-            
-            // Convert to single MatchData if any matches found
-            List<MatchData> matches = new List<MatchData>();
-            if (allMatchedItems.Count > 0)
-            {
-                matches.Add(new MatchData(new List<BoardItem>(allMatchedItems)));
             }
             
             return matches;
@@ -46,74 +77,83 @@ namespace Core
         /// <summary>
         /// Finds matches that include the items at the specified positions.
         /// Use this after a swap to check only the affected positions.
+        /// The pivot will be set to the swap position for power-up spawning.
         /// </summary>
         public List<MatchData> FindMatchesAtPositions(params (int x, int y)[] positions)
         {
-            HashSet<BoardItem> allMatchedItems = new HashSet<BoardItem>();
+            List<MatchData> matches = new List<MatchData>();
+            HashSet<BoardItem> processedHorizontal = new HashSet<BoardItem>();
+            HashSet<BoardItem> processedVertical = new HashSet<BoardItem>();
             
             foreach (var (x, y) in positions)
             {
-                FindMatchesAt(x, y, allMatchedItems);
-            }
-            
-            List<MatchData> matches = new List<MatchData>();
-            if (allMatchedItems.Count > 0)
-            {
-                matches.Add(new MatchData(new List<BoardItem>(allMatchedItems)));
+                BoardItem item = _gridManager.GetItemAt(x, y);
+                if (item == null || !IsColoredItem(item.Type)) continue;
+                
+                // Check horizontal match
+                if (!processedHorizontal.Contains(item))
+                {
+                    var horizontalMatch = GetHorizontalMatchSegment(x, y, item.Type);
+                    if (horizontalMatch.Count >= MinMatchCount)
+                    {
+                        // Use the swap position as pivot for power-up spawning
+                        matches.Add(new MatchData(horizontalMatch, MatchOrientation.Horizontal, (x, y)));
+                        foreach (var matched in horizontalMatch)
+                        {
+                            processedHorizontal.Add(matched);
+                        }
+                    }
+                }
+                
+                // Check vertical match
+                if (!processedVertical.Contains(item))
+                {
+                    var verticalMatch = GetVerticalMatchSegment(x, y, item.Type);
+                    if (verticalMatch.Count >= MinMatchCount)
+                    {
+                        // Use the swap position as pivot for power-up spawning
+                        matches.Add(new MatchData(verticalMatch, MatchOrientation.Vertical, (x, y)));
+                        foreach (var matched in verticalMatch)
+                        {
+                            processedVertical.Add(matched);
+                        }
+                    }
+                }
             }
             
             return matches;
         }
         
-        private void FindMatchesAt(int x, int y, HashSet<BoardItem> matchedItems)
+        /// <summary>
+        /// Checks if the item type is a colored/matchable item (not a power-up).
+        /// </summary>
+        private bool IsColoredItem(ItemType type)
         {
-            BoardItem item = _gridManager.GetItemAt(x, y);
-            if (item == null) return;
-            
-            ItemType type = item.Type;
-            
-            // Find horizontal match
-            List<BoardItem> horizontalMatch = GetHorizontalMatch(x, y, type);
-            if (horizontalMatch.Count >= MinMatchCount)
-            {
-                foreach (var matchedItem in horizontalMatch)
-                {
-                    matchedItems.Add(matchedItem);
-                }
-            }
-            
-            // Find vertical match
-            List<BoardItem> verticalMatch = GetVerticalMatch(x, y, type);
-            if (verticalMatch.Count >= MinMatchCount)
-            {
-                foreach (var matchedItem in verticalMatch)
-                {
-                    matchedItems.Add(matchedItem);
-                }
-            }
+            return type == ItemType.CubeRed || 
+                   type == ItemType.CubeYellow || 
+                   type == ItemType.CubeGreen || 
+                   type == ItemType.CubeBlue;
         }
         
-        private List<BoardItem> GetHorizontalMatch(int startX, int startY, ItemType type)
+        /// <summary>
+        /// Gets a horizontal match segment starting from the given position.
+        /// Returns items sorted by X coordinate.
+        /// </summary>
+        private List<BoardItem> GetHorizontalMatchSegment(int startX, int startY, ItemType type)
         {
             List<BoardItem> match = new List<BoardItem>();
             
-            // Add the starting item
-            BoardItem startItem = _gridManager.GetItemAt(startX, startY);
-            if (startItem != null)
+            // Find the leftmost item of this match
+            int leftX = startX;
+            while (leftX > 0)
             {
-                match.Add(startItem);
-            }
-            
-            // Scan left
-            for (int x = startX - 1; x >= 0; x--)
-            {
-                BoardItem item = _gridManager.GetItemAt(x, startY);
+                BoardItem item = _gridManager.GetItemAt(leftX - 1, startY);
                 if (item == null || item.Type != type) break;
-                match.Add(item);
+                leftX--;
             }
             
-            // Scan right
-            for (int x = startX + 1; x < _gridManager.Width; x++)
+            // Collect all items from left to right
+            for (int x = leftX; x < _gridManager.Width; x++)
             {
                 BoardItem item = _gridManager.GetItemAt(x, startY);
                 if (item == null || item.Type != type) break;
@@ -123,27 +163,25 @@ namespace Core
             return match;
         }
         
-        private List<BoardItem> GetVerticalMatch(int startX, int startY, ItemType type)
+        /// <summary>
+        /// Gets a vertical match segment starting from the given position.
+        /// Returns items sorted by Y coordinate.
+        /// </summary>
+        private List<BoardItem> GetVerticalMatchSegment(int startX, int startY, ItemType type)
         {
             List<BoardItem> match = new List<BoardItem>();
             
-            // Add the starting item
-            BoardItem startItem = _gridManager.GetItemAt(startX, startY);
-            if (startItem != null)
+            // Find the bottommost item of this match
+            int bottomY = startY;
+            while (bottomY > 0)
             {
-                match.Add(startItem);
-            }
-            
-            // Scan down
-            for (int y = startY - 1; y >= 0; y--)
-            {
-                BoardItem item = _gridManager.GetItemAt(startX, y);
+                BoardItem item = _gridManager.GetItemAt(startX, bottomY - 1);
                 if (item == null || item.Type != type) break;
-                match.Add(item);
+                bottomY--;
             }
             
-            // Scan up
-            for (int y = startY + 1; y < _gridManager.Height; y++)
+            // Collect all items from bottom to top
+            for (int y = bottomY; y < _gridManager.Height; y++)
             {
                 BoardItem item = _gridManager.GetItemAt(startX, y);
                 if (item == null || item.Type != type) break;

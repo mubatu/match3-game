@@ -7,6 +7,7 @@ namespace Core
     /// <summary>
     /// Handles the swap operation between two adjacent board items.
     /// Orchestrates validation, animation, grid updates, and match detection.
+    /// Also handles rocket activation when rockets are swapped.
     /// </summary>
     public class SwapHandler : MonoBehaviour
     {
@@ -55,6 +56,15 @@ namespace Core
             return true;
         }
         
+        /// <summary>
+        /// Checks if an item is a rocket power-up.
+        /// </summary>
+        private bool IsRocket(BoardItem item)
+        {
+            return item != null && 
+                   (item.Type == ItemType.RocketHorizontal || item.Type == ItemType.RocketVertical);
+        }
+        
         private void ExecuteSwap(BoardItem itemA, BoardItem itemB)
         {
             _isSwapping = true;
@@ -83,6 +93,26 @@ namespace Core
             }
             
             GameEvents.SwapCompleted(itemA, itemB);
+            
+            // Check if either swapped item is a rocket - rockets activate on swap
+            bool hasRocket = IsRocket(itemA) || IsRocket(itemB);
+            
+            if (hasRocket)
+            {
+                // Activate rockets - they always trigger on swap
+                _isSwapping = false;
+                
+                // Activate both rockets if both are rockets, otherwise just the rocket one
+                if (IsRocket(itemA))
+                {
+                    itemA.CallStrategy(gridManager);
+                }
+                if (IsRocket(itemB))
+                {
+                    itemB.CallStrategy(gridManager);
+                }
+                yield break;
+            }
             
             // Check for matches at both swapped positions
             List<MatchData> matches = _matchDetector.FindMatchesAtPositions(

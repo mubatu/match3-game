@@ -29,6 +29,7 @@ namespace Core
             GameEvents.OnGravityCompleted += HandleGravityCompleted;
             GameEvents.OnRefillStarted += HandleRefillStarted;
             GameEvents.OnRefillCompleted += HandleRefillCompleted;
+            GameEvents.OnGameStateChanged += HandleExternalStateChange;
         }
         
         private void OnDisable()
@@ -41,6 +42,7 @@ namespace Core
             GameEvents.OnGravityCompleted -= HandleGravityCompleted;
             GameEvents.OnRefillStarted -= HandleRefillStarted;
             GameEvents.OnRefillCompleted -= HandleRefillCompleted;
+            GameEvents.OnGameStateChanged -= HandleExternalStateChange;
         }
         
         /// <summary>
@@ -71,6 +73,20 @@ namespace Core
             
             SetState(GameState.Swapping);
             _cascadeCount = 0;
+        }
+        
+        /// <summary>
+        /// Handles state changes triggered externally (e.g., swap revert).
+        /// </summary>
+        private void HandleExternalStateChange(GameState newState)
+        {
+            // Only update if the state was changed externally (not by SetState)
+            // This handles cases like swap revert where SwapHandler sets state to Idle
+            if (_currentState != newState)
+            {
+                _currentState = newState;
+                Debug.Log($"[CascadeController] External state change to: {newState}");
+            }
         }
         
         private void HandleSwapCompleted(BoardItem itemA, BoardItem itemB)

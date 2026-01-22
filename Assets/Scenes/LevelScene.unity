@@ -149,6 +149,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Core.InputHandler
   dragThreshold: 0.3
+  cascadeController: {fileID: 1232921516}
 --- !u!4 &118211047
 Transform:
   m_ObjectHideFlags: 0
@@ -159,6 +160,54 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1.16809, y: -1.0843, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &228670232
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 228670234}
+  - component: {fileID: 228670233}
+  m_Layer: 0
+  m_Name: RefillManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &228670233
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 228670232}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95fb32ac9ebde4b6f84dcb5e885cbb11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Core.RefillHandler
+  gridManager: {fileID: 808385100}
+  spawnHeight: 2
+  fallDuration: 0.4
+  spawnDelayPerColumn: 0.05
+--- !u!4 &228670234
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 228670232}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.05179, y: -1.39649, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -559,6 +608,53 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &682881927
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 682881929}
+  - component: {fileID: 682881928}
+  m_Layer: 0
+  m_Name: GravityManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &682881928
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 682881927}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 768916f4723c343219065db95d7e26ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Core.GravityHandler
+  gridManager: {fileID: 808385100}
+  fallDuration: 0.3
+  fallDelayPerRow: 0.05
+--- !u!4 &682881929
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 682881927}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.05179, y: -1.39649, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &808385099
 GameObject:
   m_ObjectHideFlags: 0
@@ -590,12 +686,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Core.GridManager
   width: 9
   height: 11
-  objects:
+  initialMatchCheckDelay: 0.5
+  coloredPrefabs:
   - {fileID: 8003757824601628150, guid: fbc3c59433ba445e38a4bace6220eda1, type: 3}
   - {fileID: 4998139900432966926, guid: c5514575702654889a810ba8c819aa32, type: 3}
   - {fileID: 7461945316732146940, guid: 10bfecadcdebf479c907703a9dee84f5, type: 3}
   - {fileID: 4158623513492674278, guid: 31d15092e8e964af48532798c50307f0, type: 3}
-  initialMatchCheckDelay: 0.5
+  rocketHorizontalPrefab: {fileID: 6571570567344313277, guid: 47999c8a82aae41b6901173b9a4def3b, type: 3}
+  rocketVerticalPrefab: {fileID: 1787649578794646121, guid: 653af023d67ae49ea961cfec79b567e7, type: 3}
 --- !u!4 &808385101
 Transform:
   m_ObjectHideFlags: 0
@@ -606,6 +704,53 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.11383, y: -1.16457, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1232921515
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1232921517}
+  - component: {fileID: 1232921516}
+  m_Layer: 0
+  m_Name: CascadeManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1232921516
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1232921515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 210cf91281b7a44bc90a2ff0f05dea08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Core.CascadeController
+  gridManager: {fileID: 808385100}
+  cascadeCheckDelay: 0.1
+  maxCascadeDepth: 50
+--- !u!4 &1232921517
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1232921515}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.05179, y: -1.39649, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -653,4 +798,7 @@ SceneRoots:
   - {fileID: 118211047}
   - {fileID: 503204151}
   - {fileID: 462812214}
+  - {fileID: 682881929}
+  - {fileID: 228670234}
+  - {fileID: 1232921517}
   - {fileID: 1495361603}

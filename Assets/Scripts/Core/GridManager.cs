@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Enums;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -10,10 +11,17 @@ namespace Core
     /// </summary>
     public class GridManager : MonoBehaviour
     {
+        [Header("Grid Settings")]
         [SerializeField] private int width;
         [SerializeField] private int height;
-        [SerializeField] private GameObject[] objects;
         [SerializeField] private float initialMatchCheckDelay = 0.5f;
+        
+        [Header("Prefabs - Colored Items")]
+        [SerializeField] private GameObject[] coloredPrefabs;
+        
+        [Header("Prefabs - Power-ups")]
+        [SerializeField] private GameObject rocketHorizontalPrefab;
+        [SerializeField] private GameObject rocketVerticalPrefab;
 
         private BoardItem[,] _gridObjects;
         private MatchDetector _matchDetector;
@@ -176,11 +184,50 @@ namespace Core
         }
         
         /// <summary>
-        /// Returns the array of item prefabs used for spawning.
+        /// Returns the array of colored item prefabs used for random spawning.
         /// </summary>
-        public GameObject[] GetItemPrefabs()
+        public GameObject[] GetColoredPrefabs()
         {
-            return objects;
+            return coloredPrefabs;
+        }
+        
+        /// <summary>
+        /// Returns the appropriate rocket prefab based on orientation.
+        /// </summary>
+        public GameObject GetRocketPrefab(MatchOrientation orientation)
+        {
+            return orientation == MatchOrientation.Horizontal 
+                ? rocketHorizontalPrefab 
+                : rocketVerticalPrefab;
+        }
+        
+        /// <summary>
+        /// Spawns a rocket at the specified grid position.
+        /// </summary>
+        public BoardItem SpawnRocket(int x, int y, MatchOrientation orientation)
+        {
+            GameObject prefab = GetRocketPrefab(orientation);
+            if (prefab == null)
+            {
+                Debug.LogError($"Rocket prefab for {orientation} is not assigned!");
+                return null;
+            }
+            
+            Vector3 position = GetWorldPosition(x, y);
+            GameObject newObject = Instantiate(prefab, position, Quaternion.identity);
+            newObject.transform.parent = transform;
+            newObject.name = $"Rocket_{orientation} ({x}, {y})";
+            
+            if (newObject.TryGetComponent(out SpriteRenderer sr))
+            {
+                sr.sortingOrder = y;
+            }
+            
+            BoardItem item = newObject.GetComponent<BoardItem>();
+            item.Initialize(x, y);
+            _gridObjects[x, y] = item;
+            
+            return item;
         }
         
         private void GenerateGrid()
@@ -191,8 +238,8 @@ namespace Core
             {
                 for (int y = 0; y < height; y++)
                 {
-                    int randomIndex = Random.Range(0, objects.Length);
-                    GameObject prefabToSpawn = objects[randomIndex];
+                    int randomIndex = Random.Range(0, coloredPrefabs.Length);
+                    GameObject prefabToSpawn = coloredPrefabs[randomIndex];
                 
                     Vector3 position = GetWorldPosition(x, y);
                 
@@ -216,6 +263,11 @@ namespace Core
         public void HandleItemClick(int x, int y)
         {
             BoardItem clickedItem = _gridObjects[x, y];
+            if (clickedItem == null) return;
+            
+            // Transition to blasting state before activating power-up
+            GameEvents.GameStateChanged(GameState.Blasting);
+            
             clickedItem.CallStrategy(this);
         }
         

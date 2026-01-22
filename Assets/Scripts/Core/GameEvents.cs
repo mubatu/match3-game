@@ -22,6 +22,9 @@ namespace Core
         public static event Action<IReadOnlyList<BoardItem>> OnItemsBlasted;
         public static event Action OnBlastCompleted;
         
+        // Rocket events
+        public static event Action<MatchData, BoardItem> OnRocketBlast;
+        
         // Gravity events
         public static event Action OnGravityStarted;
         public static event Action OnGravityCompleted;
@@ -45,6 +48,9 @@ namespace Core
         public static void MatchFound(MatchData matchData) => OnMatchFound?.Invoke(matchData);
         public static void ItemsBlasted(IReadOnlyList<BoardItem> items) => OnItemsBlasted?.Invoke(items);
         public static void BlastCompleted() => OnBlastCompleted?.Invoke();
+        
+        // Raise methods - Rocket
+        public static void RocketBlast(MatchData blastData, BoardItem rocket) => OnRocketBlast?.Invoke(blastData, rocket);
         
         // Raise methods - Gravity
         public static void GravityStarted() => OnGravityStarted?.Invoke();

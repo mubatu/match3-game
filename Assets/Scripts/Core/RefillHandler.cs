@@ -142,7 +142,7 @@ namespace Core
         /// </summary>
         private void ExecuteSpawn(SpawnData spawn)
         {
-            GameObject[] prefabs = gridManager.GetItemPrefabs();
+            GameObject[] prefabs = gridManager.GetColoredPrefabs();
             int randomIndex = Random.Range(0, prefabs.Length);
             GameObject prefabToSpawn = prefabs[randomIndex];
             

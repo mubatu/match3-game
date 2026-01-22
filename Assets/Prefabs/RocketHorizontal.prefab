@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5537054597921867377}
   - component: {fileID: 4011000340459304829}
   - component: {fileID: 1973448801200100672}
-  - component: {fileID: 5782876403829977495}
+  - component: {fileID: 797098136516635613}
   m_Layer: 0
   m_Name: RocketHorizontal
   m_TagString: Untagged
@@ -139,7 +139,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 0.92957747}
   m_EdgeRadius: 0
---- !u!114 &5782876403829977495
+--- !u!114 &797098136516635613
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -152,4 +152,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Items.Rocket
   Type: 4
-  isHorizontal: 1

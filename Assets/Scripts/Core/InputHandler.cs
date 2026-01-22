@@ -5,12 +5,14 @@ using UnityEngine.InputSystem;
 namespace Core
 {
     /// <summary>
-    /// Handles user input for drag-based swap gestures.
-    /// Detects drag start, calculates direction, and identifies target item.
+    /// Handles user input for drag-based swap gestures and click activation.
+    /// Detects drag start, calculates direction, identifies target item,
+    /// and handles click-to-activate for power-ups like rockets.
     /// </summary>
     public class InputHandler : MonoBehaviour
     {
         [SerializeField] private float dragThreshold = 0.3f;
+        [SerializeField] private float clickThreshold = 0.1f;
         [SerializeField] private CascadeController cascadeController;
         
         private Camera _mainCamera;
@@ -84,6 +86,15 @@ namespace Core
             }
             
             Vector2 dragDelta = endWorldPosition - _dragStartWorldPosition;
+            
+            // Check if this was a click (minimal movement)
+            if (dragDelta.magnitude < clickThreshold)
+            {
+                HandleClick(_dragStartItem);
+                ResetDragState();
+                return;
+            }
+            
             SwapDirection direction = CalculateSwapDirection(dragDelta);
             
             if (direction != SwapDirection.None)
@@ -97,6 +108,20 @@ namespace Core
             }
             
             ResetDragState();
+        }
+        
+        /// <summary>
+        /// Handles a click on an item (used for power-up activation).
+        /// </summary>
+        private void HandleClick(BoardItem item)
+        {
+            if (item == null || item.IsMoving) return;
+            
+            // Only activate power-ups on click, not regular cubes
+            if (item.Type == ItemType.RocketHorizontal || item.Type == ItemType.RocketVertical)
+            {
+                GameEvents.ItemClicked(item.X, item.Y);
+            }
         }
         
         private SwapDirection CalculateSwapDirection(Vector2 dragDelta)
