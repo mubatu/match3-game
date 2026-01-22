@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Enums;
 
 namespace Core
 {
@@ -21,13 +22,39 @@ namespace Core
         public static event Action<IReadOnlyList<BoardItem>> OnItemsBlasted;
         public static event Action OnBlastCompleted;
         
-        // Raise methods
+        // Gravity events
+        public static event Action OnGravityStarted;
+        public static event Action OnGravityCompleted;
+        
+        // Refill events
+        public static event Action OnRefillStarted;
+        public static event Action OnRefillCompleted;
+        
+        // Game state events
+        public static event Action<GameState> OnGameStateChanged;
+        
+        // Raise methods - Input
         public static void ItemClicked(int x, int y) => OnItemClicked?.Invoke(x, y);
         public static void DragStarted(BoardItem item) => OnDragStarted?.Invoke(item);
+        
+        // Raise methods - Swap
         public static void SwapRequested(BoardItem from, BoardItem to) => OnSwapRequested?.Invoke(from, to);
         public static void SwapCompleted(BoardItem itemA, BoardItem itemB) => OnSwapCompleted?.Invoke(itemA, itemB);
+        
+        // Raise methods - Match
         public static void MatchFound(MatchData matchData) => OnMatchFound?.Invoke(matchData);
         public static void ItemsBlasted(IReadOnlyList<BoardItem> items) => OnItemsBlasted?.Invoke(items);
         public static void BlastCompleted() => OnBlastCompleted?.Invoke();
+        
+        // Raise methods - Gravity
+        public static void GravityStarted() => OnGravityStarted?.Invoke();
+        public static void GravityCompleted() => OnGravityCompleted?.Invoke();
+        
+        // Raise methods - Refill
+        public static void RefillStarted() => OnRefillStarted?.Invoke();
+        public static void RefillCompleted() => OnRefillCompleted?.Invoke();
+        
+        // Raise methods - Game State
+        public static void GameStateChanged(GameState newState) => OnGameStateChanged?.Invoke(newState);
     }
 }

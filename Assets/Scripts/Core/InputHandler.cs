@@ -11,6 +11,7 @@ namespace Core
     public class InputHandler : MonoBehaviour
     {
         [SerializeField] private float dragThreshold = 0.3f;
+        [SerializeField] private CascadeController cascadeController;
         
         private Camera _mainCamera;
         private BoardItem _dragStartItem;
@@ -29,6 +30,16 @@ namespace Core
         
         private void HandleDragInput()
         {
+            // Block input when game is not idle
+            if (cascadeController != null && !cascadeController.CanAcceptInput())
+            {
+                if (_isDragging)
+                {
+                    ResetDragState();
+                }
+                return;
+            }
+            
             Vector2 mouseScreenPosition = Mouse.current.position.ReadValue();
             Vector2 mouseWorldPosition = _mainCamera.ScreenToWorldPoint(mouseScreenPosition);
             

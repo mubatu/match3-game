@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Enums;
 using UnityEngine;
 
 namespace Core
@@ -37,6 +38,8 @@ namespace Core
             if (!ValidateSwap(itemA, itemB))
             {
                 Debug.LogWarning($"Invalid swap attempted: ({itemA.X},{itemA.Y}) to ({itemB.X},{itemB.Y})");
+                // Return to idle state if swap is invalid
+                GameEvents.GameStateChanged(GameState.Idle);
                 return;
             }
             
@@ -124,6 +127,9 @@ namespace Core
             }
             
             Debug.Log("Swap reverted - no matches found");
+            
+            // Return to idle state after revert
+            GameEvents.GameStateChanged(GameState.Idle);
         }
     }
 }

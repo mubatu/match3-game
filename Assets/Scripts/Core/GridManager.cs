@@ -136,6 +136,53 @@ namespace Core
             }
         }
         
+        /// <summary>
+        /// Sets the item at the specified grid position.
+        /// Used by gravity system to update item positions.
+        /// </summary>
+        public void SetItemAt(int x, int y, BoardItem item)
+        {
+            if (!IsValidPosition(x, y)) return;
+            _gridObjects[x, y] = item;
+        }
+        
+        /// <summary>
+        /// Clears the item at the specified grid position (sets to null).
+        /// Used by gravity system when moving items.
+        /// </summary>
+        public void ClearItemAt(int x, int y)
+        {
+            if (!IsValidPosition(x, y)) return;
+            _gridObjects[x, y] = null;
+        }
+        
+        /// <summary>
+        /// Counts empty cells in a column from a starting Y position upward.
+        /// Used by refill system to determine how many items to spawn.
+        /// </summary>
+        public int CountEmptyCellsInColumn(int x)
+        {
+            if (x < 0 || x >= width) return 0;
+            
+            int emptyCount = 0;
+            for (int y = 0; y < height; y++)
+            {
+                if (_gridObjects[x, y] == null)
+                {
+                    emptyCount++;
+                }
+            }
+            return emptyCount;
+        }
+        
+        /// <summary>
+        /// Returns the array of item prefabs used for spawning.
+        /// </summary>
+        public GameObject[] GetItemPrefabs()
+        {
+            return objects;
+        }
+        
         private void GenerateGrid()
         {
             _gridObjects = new BoardItem[width, height];
