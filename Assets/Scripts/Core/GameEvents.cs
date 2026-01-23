@@ -25,6 +25,9 @@ namespace Core
         // Rocket events
         public static event Action<MatchData, BoardItem> OnRocketBlast;
         
+        // Snitch events
+        public static event Action<MatchData, BoardItem> OnSnitchBlast;
+        
         // Gravity events
         public static event Action OnGravityStarted;
         public static event Action OnGravityCompleted;
@@ -51,6 +54,9 @@ namespace Core
         
         // Raise methods - Rocket
         public static void RocketBlast(MatchData blastData, BoardItem rocket) => OnRocketBlast?.Invoke(blastData, rocket);
+        
+        // Raise methods - Snitch
+        public static void SnitchBlast(MatchData blastData, BoardItem snitch) => OnSnitchBlast?.Invoke(blastData, snitch);
         
         // Raise methods - Gravity
         public static void GravityStarted() => OnGravityStarted?.Invoke();

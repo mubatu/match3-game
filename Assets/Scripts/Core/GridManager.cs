@@ -22,6 +22,8 @@ namespace Core
         [Header("Prefabs - Power-ups")]
         [SerializeField] private GameObject rocketHorizontalPrefab;
         [SerializeField] private GameObject rocketVerticalPrefab;
+        [SerializeField] private GameObject snitchPrefab;
+        [SerializeField] private GameObject snitchLuckyPrefab;
 
         private BoardItem[,] _gridObjects;
         private MatchDetector _matchDetector;
@@ -217,6 +219,46 @@ namespace Core
             GameObject newObject = Instantiate(prefab, position, Quaternion.identity);
             newObject.transform.parent = transform;
             newObject.name = $"Rocket_{orientation} ({x}, {y})";
+            
+            if (newObject.TryGetComponent(out SpriteRenderer sr))
+            {
+                sr.sortingOrder = y;
+            }
+            
+            BoardItem item = newObject.GetComponent<BoardItem>();
+            item.Initialize(x, y);
+            _gridObjects[x, y] = item;
+            
+            return item;
+        }
+        
+        /// <summary>
+        /// Returns the appropriate Snitch prefab (50% chance for regular, 50% for lucky).
+        /// </summary>
+        public GameObject GetSnitchPrefab()
+        {
+            return Random.value < 0.5f ? snitchPrefab : snitchLuckyPrefab;
+        }
+        
+        /// <summary>
+        /// Spawns a Snitch at the specified grid position.
+        /// Randomly chooses between regular Snitch and SnitchLucky (50/50).
+        /// </summary>
+        public BoardItem SpawnSnitch(int x, int y)
+        {
+            GameObject prefab = GetSnitchPrefab();
+            if (prefab == null)
+            {
+                Debug.LogError("Snitch prefab is not assigned!");
+                return null;
+            }
+            
+            Vector3 position = GetWorldPosition(x, y);
+            GameObject newObject = Instantiate(prefab, position, Quaternion.identity);
+            newObject.transform.parent = transform;
+            
+            bool isLucky = prefab == snitchLuckyPrefab;
+            newObject.name = $"Snitch{(isLucky ? "Lucky" : "")} ({x}, {y})";
             
             if (newObject.TryGetComponent(out SpriteRenderer sr))
             {

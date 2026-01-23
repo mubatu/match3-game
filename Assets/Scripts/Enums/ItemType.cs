@@ -11,6 +11,8 @@ namespace Enums
         // Power-ups
         RocketHorizontal,
         RocketVertical,
+        Snitch,
+        SnitchLucky,
     }
     
     /// <summary>
@@ -19,6 +21,7 @@ namespace Enums
     public enum MatchOrientation
     {
         Horizontal,
-        Vertical
+        Vertical,
+        Square // For 2x2 matches that create Snitch
     }
 }

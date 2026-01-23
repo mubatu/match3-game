@@ -65,6 +65,15 @@ namespace Core
                    (item.Type == ItemType.RocketHorizontal || item.Type == ItemType.RocketVertical);
         }
         
+        /// <summary>
+        /// Checks if an item is a Snitch power-up.
+        /// </summary>
+        private bool IsSnitch(BoardItem item)
+        {
+            return item != null && 
+                   (item.Type == ItemType.Snitch || item.Type == ItemType.SnitchLucky);
+        }
+        
         private void ExecuteSwap(BoardItem itemA, BoardItem itemB)
         {
             _isSwapping = true;
@@ -94,20 +103,20 @@ namespace Core
             
             GameEvents.SwapCompleted(itemA, itemB);
             
-            // Check if either swapped item is a rocket - rockets activate on swap
-            bool hasRocket = IsRocket(itemA) || IsRocket(itemB);
+            // Check if either swapped item is a power-up - power-ups activate on swap
+            bool hasPowerUp = IsRocket(itemA) || IsRocket(itemB) || IsSnitch(itemA) || IsSnitch(itemB);
             
-            if (hasRocket)
+            if (hasPowerUp)
             {
-                // Activate rockets - they always trigger on swap
+                // Activate power-ups - they always trigger on swap
                 _isSwapping = false;
                 
-                // Activate both rockets if both are rockets, otherwise just the rocket one
-                if (IsRocket(itemA))
+                // Activate both power-ups if both are power-ups, otherwise just the power-up one
+                if (IsRocket(itemA) || IsSnitch(itemA))
                 {
                     itemA.CallStrategy(gridManager);
                 }
-                if (IsRocket(itemB))
+                if (IsRocket(itemB) || IsSnitch(itemB))
                 {
                     itemB.CallStrategy(gridManager);
                 }

@@ -118,7 +118,8 @@ namespace Core
             if (item == null || item.IsMoving) return;
             
             // Only activate power-ups on click, not regular cubes
-            if (item.Type == ItemType.RocketHorizontal || item.Type == ItemType.RocketVertical)
+            if (item.Type == ItemType.RocketHorizontal || item.Type == ItemType.RocketVertical ||
+                item.Type == ItemType.Snitch || item.Type == ItemType.SnitchLucky)
             {
                 GameEvents.ItemClicked(item.X, item.Y);
             }

@@ -30,9 +30,14 @@ namespace Core
         public (int X, int Y) PivotPosition { get; }
         
         /// <summary>
-        /// Whether this match qualifies for a power-up (4+ items).
+        /// Whether this match qualifies for a rocket power-up (4+ linear items).
         /// </summary>
-        public bool IsPowerUpMatch => Count >= 4;
+        public bool IsPowerUpMatch => Count >= 4 && Orientation != MatchOrientation.Square;
+        
+        /// <summary>
+        /// Whether this match qualifies for a Snitch power-up (2x2 square pattern).
+        /// </summary>
+        public bool IsSnitchMatch => Orientation == MatchOrientation.Square;
         
         public MatchData(List<BoardItem> matchedItems, MatchOrientation orientation, (int X, int Y) pivotPosition)
         {

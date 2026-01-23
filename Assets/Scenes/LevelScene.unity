@@ -149,6 +149,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Core.InputHandler
   dragThreshold: 0.3
+  clickThreshold: 0.1
   cascadeController: {fileID: 1232921516}
 --- !u!4 &118211047
 Transform:
@@ -320,6 +321,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Core.BlastHandler
   blastDuration: 0.2
+  rocketBlastCollectionDelay: 0.05
   gridManager: {fileID: 808385100}
 --- !u!4 &462812214
 Transform:
@@ -694,6 +696,8 @@ MonoBehaviour:
   - {fileID: 4158623513492674278, guid: 31d15092e8e964af48532798c50307f0, type: 3}
   rocketHorizontalPrefab: {fileID: 6571570567344313277, guid: 47999c8a82aae41b6901173b9a4def3b, type: 3}
   rocketVerticalPrefab: {fileID: 1787649578794646121, guid: 653af023d67ae49ea961cfec79b567e7, type: 3}
+  snitchPrefab: {fileID: 2706931597574993410, guid: 333500852843a47c7b4a9fe60585c454, type: 3}
+  snitchLuckyPrefab: {fileID: 4467963229745233412, guid: cb366a2078eb846069d881e9ba7ec589, type: 3}
 --- !u!4 &808385101
 Transform:
   m_ObjectHideFlags: 0
